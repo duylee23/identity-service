@@ -2,6 +2,8 @@ package com.duyle.identity_service.controller;
 
 import com.duyle.identity_service.dto.request.AuthenticationRequest;
 import com.duyle.identity_service.dto.request.IntrospectRequest;
+import com.duyle.identity_service.dto.request.LogoutRequest;
+import com.duyle.identity_service.dto.request.RefreshTokenRequest;
 import com.duyle.identity_service.dto.response.ApiResponse;
 import com.duyle.identity_service.dto.response.AuthenticationResponse;
 import com.duyle.identity_service.dto.response.IntrospectResponse;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/auth")
@@ -29,6 +32,16 @@ public class AuthenticationController {
         var result = authenticationService.authenticate(request);
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(result)
+                .message("Log-in successfully!")
+                .build();
+    }
+
+    @PostMapping("/refresh-token")
+    ApiResponse<AuthenticationResponse> refreshToken(@RequestBody RefreshTokenRequest request) throws ParseException, JOSEException {
+        var result = authenticationService.refreshToken(request);
+        return ApiResponse.<AuthenticationResponse>builder()
+                .result(result)
+                .message("refresh token successfully!")
                 .build();
     }
 
@@ -37,6 +50,15 @@ public class AuthenticationController {
         var result = authenticationService.introspect(request);
         return ApiResponse.<IntrospectResponse>builder()
                 .result(result)
+                .message("Token valid!")
                 .build();
     }
+
+    @PostMapping(value = "/logout")
+    ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+        authenticationService.logout(request);
+        return ApiResponse.<Void>builder().build();
+    }
+
+
 }
